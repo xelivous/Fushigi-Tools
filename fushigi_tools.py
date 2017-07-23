@@ -45,7 +45,7 @@ def process_file(file_path):
                         return
 
                 # folder creation and file unpacking
-
+                unpacker.unpack(main_file, file_format, metadata, asset_dir)
     else:
         log.error('unsupported extension: %s', extension)
         return

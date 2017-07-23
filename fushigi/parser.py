@@ -31,13 +31,32 @@ def file_info(file_handler):
                 data = read_chunk(folder['offset'], folder_size, f)
                 while data.tell() < folder_size - 1:
                     folder['files'].append({
-                        'data_length': read_byte(data), # relatively useless, but i'll return it anyway
+                        'info_length': read_byte(data), # relatively useless, but i'll return it anyway
                         'offset': read('>I', 4, data), # big endian because why the fuck not
-                        'filename': read_null_term_string(data)
+                        'filename': read_null_term_string(data),
+                        'data': []
                     })
                     align(2, f)
         log.debug('completed folders: %s', folders)
 
+        for folder in folders:
+            for fil in folder['files']:
+                f.seek(fil['offset'])
+                file_length = read('<I', 4, f)
+                file_unknown = read('<I', 4, f)
+                contents_offset = f.tell() # basically fil['offset'] + 8..., which matches up with the next file's start usually
+                
+                #log.info('file: %s | offset: %s | length: %s | unknown: %s', fil['filename'], fil['offset'], file_length, file_unknown)
+                fil['data'] = {
+                    'length': file_length,
+                    'unknown': file_unknown,
+                    'contents_offset': contents_offset
+                }
+
+                
+                
+                
+        
     else:
         log.error('unsupported file format: %s', file_format)
 
